@@ -1,29 +1,26 @@
 from random import randint
 class Card:
     def __init__(self):
-        self.my_list = []
-        self.my_dict = {}
+        self.matrix = [[0, 0, 0, 0, 0, 0, 0, 0, 0],
+                       [0, 0, 0, 0, 0, 0, 0, 0, 0],
+                       [0, 0, 0, 0, 0, 0, 0, 0, 0]]
+        self.count_paso = 0
         self.numerics = {el for el in range(1, 91)}
-        i = 0
-        while i < 15:
-            while True:
+        for row in self.matrix:
+            i = 0
+            while i < 5:
                 new_value = self.generic_next()
-                key = new_value // 10
-                value = self.my_dict.get(key)
-                if value is None:
-                    self.my_dict[key] = 1
-                    self.my_list.append(new_value)
-                    i += 1
-                    break
+                if new_value == 90:
+                    column_number = 8
                 else:
-                    if value == 2:
-                        continue
-                    else:
-                        self.my_dict[key] += 1
-                        self.my_list.append(new_value)
-                        i += 1
-                        break
-        #self.my_list.sort()
+                    column_number = new_value // 10
+                if row[column_number] == 0:
+                    row[column_number] = new_value
+                else:
+                    continue
+                self.count_paso += 1
+                i += 1
+        print(self.matrix)
 
     def generic_next(self):
         while True:
@@ -32,14 +29,27 @@ class Card:
                 self.numerics.remove(number)
                 return number
 
+    def contain_paso(self, paso):
+        for x, row in enumerate(self.matrix):
+            for y, value in enumerate(row):
+                if value == paso:
+                    self.matrix[x][y] = 0
+                    self.count_paso -= 1
+                    return True
+        return False
+
     def __str__(self):
-        self.my_str = ''
-        for ind, el in enumerate(self.my_list, start=1):
-            if ind % 5 == 0:
-                self.my_str = self.my_str + str(el) + '\n'
-            else:
-                self.my_str = self.my_str + str(el) + ' '
-        return f'{self.my_str}'
+        all_str = ''
+        for row in self.matrix:
+            row_str = ''
+            for value in row:
+                if value == 0:
+                    row_str += "  "
+                else:
+                    row_str += str(value) + " "
+            all_str += row_str + '\n'
+        return all_str
+
 
 class Player:
     def __init__(self, name):
@@ -49,14 +59,14 @@ class Player:
     def player_step(self, paso):
         print(paso)
         answer = input('У вас есть бочонок? y/n')
-        if self.my_card.my_list.count(paso) != 0 and answer == 'y':
-                self.my_card.my_list[self.my_card.my_list.index(paso)] = '-'
-        elif (self.my_card.my_list.count(paso) != 0 and answer == 'n') or (self.my_card.my_list.count(paso) == 0 and answer == 'y'):
-                print('Game over')
-                exit(Player)
-        else: pass
-        return f'new_card \n{self.my_card}'
-
+        contain_paso = self.my_card.contain_paso(paso)
+        if contain_paso == True and answer == 'y':
+            print(f'new_card \n{self.my_card}')
+        elif (contain_paso == True and answer == 'n') or (self.my_card.count_paso == 0 and answer == 'y'):
+            print('Game Over')
+            exit(player)
+        else:
+            pass
 
 class Base:
     def __init__(self):
@@ -75,6 +85,6 @@ while input() != 'y':
     player = Player('Helen')
     print(player.my_card)
     while player.my_card != 0:
-        print(player.player_step(b.el_paso()))
+        player.player_step(b.el_paso())
     print('Exit? y/n')
 
